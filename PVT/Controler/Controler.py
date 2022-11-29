@@ -65,3 +65,25 @@ def main():
     plt.ylabel("Solubilidad")
     plt.title("Rs vs P")
     plt.show()
+
+    # Bo
+    Bo_corr = []
+    for i in range(Num_datos):
+        Bo_corr.append(corr_Bo)
+
+    Params_Bo = pd.DataFrame({"Correlacion": Bo_corr,"Presion": RAND_PRESIONS,"Presion_burb":df_data[PRESION_SAT],"Rs":df_results[Rs_],"Rsb":df_results[Rsb_],"G_gas":df_data[G_GAS],"G_oil":df_data[G_OIL],"Temperatura":df_data[TEMPERATURA],"API":df_data[API]})
+    v_Bo = []
+    for i in range(Num_datos):
+        Bo_resul = Bo(*(
+            Params_Bo.iloc[i, 0], Params_Bo.iloc[i, 1], Params_Bo.iloc[i, 2], Params_Bo.iloc[i, 3],
+            Params_Bo.iloc[i, 4],
+            Params_Bo.iloc[i, 5], Params_Bo.iloc[i, 6], Params_Bo.iloc[0, 7], Params_Bo.iloc[0, 8]))
+        v_Bo.append(Bo_resul)
+    sheet_summary["J6"].options(transpose=True).value = v_Bo
+
+    # Bo
+    plt.plot(df_data[PRESION_TEST], df_results[Bo_])
+    plt.xlabel("Presion")
+    plt.ylabel("Factor Volumétrico")
+    plt.title("Bo vs P")
+    plt.show()
