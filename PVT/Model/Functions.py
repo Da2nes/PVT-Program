@@ -46,3 +46,57 @@ def Bo(colums,P,Pb,Rs,Rsb,Yg,Yo,T,API):
             Bob = 0.497069 + 0.862963 * (10**(-3)) * T + 0.182594 * 10**(-2) * Frsb + 0.318099 * 10**(-5) * Frsb**(2)
             Bo = Bob*(math.exp(((-A)*((P**(0.4094))-(Pb**(0.4094))))))
     return Bo
+
+#%% Funcion Rs
+
+def Rs(colums, P, Pb, API, T=None, Yg=None, Yo=None):
+    """"
+    Parameters
+    ---------------
+    colums:
+        Correlación usada
+    P:
+        Presión del sistema en psi
+
+    Pb:
+        Presión del punto de burbuja
+
+    API:
+        Gravedad API
+    T:
+        Temperatura del sistema en °R
+    Yg:
+        Gravedad específica del gas en superficie
+    Yo:
+        Gravedad específica del crudo en superficie
+
+    Returns
+        float number  -> Rs
+    """
+    x = 0.0125 * API - 0.00091 * (T - 460)
+    a = 185.843208
+    b = 1.877840
+    c = -3.1437
+    d = -1.32657
+    e = 1.398441
+    if P < Pb:
+        if colums == "Standing":
+            Rs = float((Yg) * (((P / 18.2) + 1.4) * (10 ** x)) ** 1.2048)
+
+        elif colums == "Al-Marhoun":
+            Rs = float((a * (Yg ** b) * (Yo ** c) * (T ** d) * P) ** e)
+
+        else:
+            Rs = string("Seleccione una correlación de la lista")
+
+    else:
+        if colums == "Standing":
+            Rsb = float((Yg) * (((Pb / 18.2) + 1.4) * (10 ** x)) ** 1.2048)
+            Rs = Rsb
+        elif colums == "Al-Marhoun":
+            Rsb = float((a * (Yg ** b) * (Yo ** c) * (T ** d) * Pb) ** e)
+            Rs = Rsb
+        else:
+            Rs = string("Seleccione una correlación de la lista")
+            Rsb = 0
+    return Rs
