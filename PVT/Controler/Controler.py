@@ -27,3 +27,41 @@ TEMPERATURA = "Temperatura (R)"
 API = "°API"
 G_GAS = "ϒgas"
 G_OIL = "ϒoil"
+
+def main():
+    wb = xw.Book.caller()
+    sheet_summary = wb.sheets[SUMMARY]
+    RAND_PRESIONS = np.array(sorted((list(range(150,3150,150))),reverse=True))
+    sheet_summary["B6"].options(transpose = True).value = RAND_PRESIONS
+    df_data = sheet_summary["B5"].options(pd.DataFrame, expand = "table", index = False).value
+    df_correlations = sheet_summary["I3"].options(pd.DataFrame, expand="table", index=False).value
+    df_results = sheet_summary["H5"].options(pd.DataFrame, expand="table", index=False).value
+    corr_Rs = df_correlations.iloc[0,0]
+    corr_Bo = df_correlations.iloc[0,1]
+    corr_Uo = df_correlations.iloc[0,2]
+
+    #%%Rs
+
+    Rs_corr = []
+    for i in range(Num_datos):
+        Rs_corr.append(corr_Rs)
+    Params_Rs = pd.DataFrame({"Correlacion": Rs_corr,"Presion": RAND_PRESIONS,"Presion_Burb": df_data[PRESION_SAT], "API": df_data[API], "Temperatura": df_data[TEMPERATURA], "G_gas": df_data[G_GAS], "G_oil": df_data[G_OIL]})
+    v_Rs = []
+    for i in range(Num_datos):
+        Rs_resul = Rs(*(Params_Rs.iloc[i,0],Params_Rs.iloc[i,1],Params_Rs.iloc[i,2],Params_Rs.iloc[i,3],Params_Rs.iloc[i,4],Params_Rs.iloc[i,5],Params_Rs.iloc[i,6]))
+        v_Rs.append(Rs_resul)
+
+    sheet_summary["I6"].options(transpose = True).value = v_Rs #Agregando el vector Rs result al data frame resultado
+
+    Rs_saturacion = df_results.iloc[0,1]
+    v_Rsb = []
+    for i in range(Num_datos):
+        v_Rsb.append(Rs_saturacion)
+    sheet_summary["L6"].options(transpose=True).value = v_Rsb
+
+    # Rs
+    plt.plot(df_data[PRESION_TEST], df_results[Rs_])
+    plt.xlabel("Presion")
+    plt.ylabel("Solubilidad")
+    plt.title("Rs vs P")
+    plt.show()
