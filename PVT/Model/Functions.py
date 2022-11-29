@@ -100,3 +100,74 @@ def Rs(colums, P, Pb, API, T=None, Yg=None, Yo=None):
             Rs = string("Seleccione una correlación de la lista")
             Rsb = 0
     return Rs
+
+#%%Funcion de la Uo
+
+def Uo(colums, P, Pb, API, T, Rs, Rsb):
+    """
+
+    Parameters
+    ----------
+    colums
+        Correlación usada
+    P
+        Presion del sistema
+    Pb
+        Presion de saturación
+    API
+        Gravedas API
+    T
+        Temperatura en °R
+    Rs
+        Solubilidad del gas
+    Rsb
+        Solubilidad del gas a presión de saturación
+
+    Returns
+        Uo en cp
+    -------
+
+    """
+
+    a = float(10**(0.43+(8.33/API)))
+    a1 = float(10.313 * math.log10(T-460)) - 36.447
+    a2 = float(Rs * (((2.2E-7) * Rs) - (7.4E-4)))
+    c = (8.62E-5) * Rs
+    d = (1.1E-3) * Rs
+    e = (3.741E-3) * Rs
+    b = (0.68 / (10 * c)) + (0.25 / (10 * d)) + (0.062 / (10 ** e))
+
+
+    a2_ = float(Rsb * (((2.2E-7) * Rsb) - (7.4E-4)))
+    c_ = (8.62E-5) * Rsb
+    d_ = (1.1E-3) * Rsb
+    e_ = (3.741E-3) * Rsb
+    b_ = (0.68 / (10 * c)) + (0.25 / (10 * d)) + (0.062 / (10 ** e))
+    a3_ = ((-3.9E-5)*P)-5
+    m = (2.6*(P*1.187))(10**a3_)
+
+
+    if P < Pb:
+        if colums == "Beal":
+            Uod = (0.32+(1.8E7/(API*4.53))(360/(T-260))**a)
+            Uob = ((10)*a2)(Uod**b)
+            Uo = Uob
+
+        else:
+            Uod = 3.141 * (10*10) * (T-460)(-3.414) * (math.log10(API))*a1
+            Uob = ((10) * a2_) * (Uod*b)
+            Uo = Uob
+            #Uo = Uob (P/Pb)**m
+    else:
+        if colums == "Beal":
+            Uod = (0.32+(1.8E7/(API*4.53))(360/(T-260))**a)
+            Uob = ((10)*a2)(Uod**b)
+            Uo = Uob*((P/Pb)**m)
+
+        else:
+            Uod = 3.141 * (10*10) * (T-460)(-3.414) * (math.log10(API))*a1
+            Uob = ((10) * a2_) * (Uod*b)
+            Uo = Uob*((P/Pb)**m)
+
+
+    return Uo
