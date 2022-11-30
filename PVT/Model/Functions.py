@@ -154,17 +154,17 @@ def Uo(colums, P, Pb, API, T, Rs, Rsb):
             Uo = Uob
 
         else:
-            Uod = 3.141 * (10*10) * (T-460)(-3.414) * (math.log10(API))*a1
+            Uod = 3.141 * (10**10) * (T-460)**(-3.414) * (math.log10(API))**a1
             Uob = ((10) ** a2_) * (Uod**b)
             Uo = Uob
     else:
         if colums == "Beal":
-            Uod = (0.32+(1.8E7/(API**(4.53))))*(360/(T-260))**a
+            Uod = (0.32+(1.8E7/(API**(4.53))))*((360/(T-260))**a)
             Uob = ((10)**a2)*(Uod**b)
             Uo = Uob*((P/Pb)**m)
 
         else:
-            Uod = 3.141 * (10*10) * (T-460)(-3.414) * (math.log10(API))*a1
+            Uod = 3.141 * (10**10) * (T-460)**(-3.414) * (math.log10(API))**a1
             Uob = ((10) ** a2_) * (Uod**b)
             Uo = Uob*((P/Pb)**m)
 
