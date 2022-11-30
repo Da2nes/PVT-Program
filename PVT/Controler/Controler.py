@@ -87,3 +87,31 @@ def main():
     plt.ylabel("Factor Volumétrico")
     plt.title("Bo vs P")
     plt.show()
+
+    #Uo
+
+    Uo_corr = []
+    for i in range(Num_datos):
+        Uo_corr.append(corr_Uo)
+
+    Params_Uo = pd.DataFrame(
+        {"Correlacion": Uo_corr,"Presion": RAND_PRESIONS,"Presion_burb": df_data[PRESION_SAT], "API": df_data[API], "Temperatura": df_data[TEMPERATURA],"Rs": df_results[Rs_],"Rsb": df_results[Rsb_]})
+    v_Uo = []
+    for i in range(Num_datos):
+        Uo_resul = Uo(*(
+            Params_Uo.iloc[i, 0], Params_Uo.iloc[i, 1], Params_Uo.iloc[i, 2], Params_Uo.iloc[i, 3], Params_Uo.iloc[i, 4], Params_Uo.iloc[i, 5], Params_Uo.iloc[i, 6]))
+        v_Uo.append(Uo_resul)
+
+    sheet_summary["K6"].options(transpose=True).value = v_Uo
+
+    # Uo
+    plt.plot(df_data[PRESION_TEST], df_results[Uo_])
+    plt.xlabel("Presion")
+    plt.ylabel("Viscosidad")
+    plt.title("Uo vs P")
+    plt.show()
+
+
+if __name__ == "__main__":
+    xw.Book("Controler.xlsm").set_mock_caller()
+    main()
