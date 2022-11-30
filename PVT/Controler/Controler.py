@@ -1,6 +1,4 @@
 #%% Import Libraries
-import blackd
-
 import xlwings as xw
 import numpy as np
 import pandas as pd
@@ -11,7 +9,7 @@ from PVT.Model.Functions import Bo
 from PVT.Model.Functions import Uo
 
 #%% Program code
-#Etiquetas
+# Etiquetas
 SUMMARY = "Summary"
 RESULTS = "Results"
 Rs_ = "Rs"
@@ -28,32 +26,61 @@ API = "°API"
 G_GAS = "ϒgas"
 G_OIL = "ϒoil"
 
+
 def main():
     wb = xw.Book.caller()
     sheet_summary = wb.sheets[SUMMARY]
-    RAND_PRESIONS = np.array(sorted((list(range(150,3150,150))),reverse=True))
-    sheet_summary["B6"].options(transpose = True).value = RAND_PRESIONS
-    df_data = sheet_summary["B5"].options(pd.DataFrame, expand = "table", index = False).value
-    df_correlations = sheet_summary["I3"].options(pd.DataFrame, expand="table", index=False).value
-    df_results = sheet_summary["H5"].options(pd.DataFrame, expand="table", index=False).value
-    corr_Rs = df_correlations.iloc[0,0]
-    corr_Bo = df_correlations.iloc[0,1]
-    corr_Uo = df_correlations.iloc[0,2]
+    RAND_PRESIONS = np.array(sorted((list(range(150, 3150, 150))), reverse=True))
+    sheet_summary["B6"].options(transpose=True).value = RAND_PRESIONS
+    df_data = (
+        sheet_summary["B5"].options(pd.DataFrame, expand="table", index=False).value
+    )
+    df_correlations = (
+        sheet_summary["I3"].options(pd.DataFrame, expand="table", index=False).value
+    )
+    df_results = (
+        sheet_summary["H5"].options(pd.DataFrame, expand="table", index=False).value
+    )
+    corr_Rs = df_correlations.iloc[0, 0]
+    corr_Bo = df_correlations.iloc[0, 1]
+    corr_Uo = df_correlations.iloc[0, 2]
 
     #%%Rs
 
     Rs_corr = []
     for i in range(Num_datos):
         Rs_corr.append(corr_Rs)
-    Params_Rs = pd.DataFrame({"Correlacion": Rs_corr,"Presion": RAND_PRESIONS,"Presion_Burb": df_data[PRESION_SAT], "API": df_data[API], "Temperatura": df_data[TEMPERATURA], "G_gas": df_data[G_GAS], "G_oil": df_data[G_OIL]})
+    Params_Rs = pd.DataFrame(
+        {
+            "Correlacion": Rs_corr,
+            "Presion": RAND_PRESIONS,
+            "Presion_Burb": df_data[PRESION_SAT],
+            "API": df_data[API],
+            "Temperatura": df_data[TEMPERATURA],
+            "G_gas": df_data[G_GAS],
+            "G_oil": df_data[G_OIL],
+        }
+    )
     v_Rs = []
     for i in range(Num_datos):
-        Rs_resul = Rs(*(Params_Rs.iloc[i,0],Params_Rs.iloc[i,1],Params_Rs.iloc[i,2],Params_Rs.iloc[i,3],Params_Rs.iloc[i,4],Params_Rs.iloc[i,5],Params_Rs.iloc[i,6]))
+        Rs_resul = Rs(
+            *(
+                Params_Rs.iloc[i, 0],
+                Params_Rs.iloc[i, 1],
+                Params_Rs.iloc[i, 2],
+                Params_Rs.iloc[i, 3],
+                Params_Rs.iloc[i, 4],
+                Params_Rs.iloc[i, 5],
+                Params_Rs.iloc[i, 6],
+            )
+        )
         v_Rs.append(Rs_resul)
 
-    sheet_summary["I6"].options(transpose = True).value = v_Rs #Agregando el vector Rs result al data frame resultado
+    sheet_summary["I6"].options(
+        transpose=True
+    ).value = v_Rs  # Agregando el vector Rs result al data frame resultado
 
-    Rs_saturacion = df_results.iloc[0,1]
+    Rs_saturacion = df_results.iloc[0, 1]
     v_Rsb = []
     for i in range(Num_datos):
         v_Rsb.append(Rs_saturacion)
@@ -71,13 +98,34 @@ def main():
     for i in range(Num_datos):
         Bo_corr.append(corr_Bo)
 
-    Params_Bo = pd.DataFrame({"Correlacion": Bo_corr,"Presion": RAND_PRESIONS,"Presion_burb":df_data[PRESION_SAT],"Rs":df_results[Rs_],"Rsb":df_results[Rsb_],"G_gas":df_data[G_GAS],"G_oil":df_data[G_OIL],"Temperatura":df_data[TEMPERATURA],"API":df_data[API]})
+    Params_Bo = pd.DataFrame(
+        {
+            "Correlacion": Bo_corr,
+            "Presion": RAND_PRESIONS,
+            "Presion_burb": df_data[PRESION_SAT],
+            "Rs": df_results[Rs_],
+            "Rsb": df_results[Rsb_],
+            "G_gas": df_data[G_GAS],
+            "G_oil": df_data[G_OIL],
+            "Temperatura": df_data[TEMPERATURA],
+            "API": df_data[API],
+        }
+    )
     v_Bo = []
     for i in range(Num_datos):
-        Bo_resul = Bo(*(
-            Params_Bo.iloc[i, 0], Params_Bo.iloc[i, 1], Params_Bo.iloc[i, 2], Params_Bo.iloc[i, 3],
-            Params_Bo.iloc[i, 4],
-            Params_Bo.iloc[i, 5], Params_Bo.iloc[i, 6], Params_Bo.iloc[0, 7], Params_Bo.iloc[0, 8]))
+        Bo_resul = Bo(
+            *(
+                Params_Bo.iloc[i, 0],
+                Params_Bo.iloc[i, 1],
+                Params_Bo.iloc[i, 2],
+                Params_Bo.iloc[i, 3],
+                Params_Bo.iloc[i, 4],
+                Params_Bo.iloc[i, 5],
+                Params_Bo.iloc[i, 6],
+                Params_Bo.iloc[0, 7],
+                Params_Bo.iloc[0, 8],
+            )
+        )
         v_Bo.append(Bo_resul)
     sheet_summary["J6"].options(transpose=True).value = v_Bo
 
@@ -88,18 +136,36 @@ def main():
     plt.title("Bo vs P")
     plt.show()
 
-    #Uo
+    # Uo
 
     Uo_corr = []
     for i in range(Num_datos):
         Uo_corr.append(corr_Uo)
 
     Params_Uo = pd.DataFrame(
-        {"Correlacion": Uo_corr,"Presion": RAND_PRESIONS,"Presion_burb": df_data[PRESION_SAT], "API": df_data[API], "Temperatura": df_data[TEMPERATURA],"Rs": df_results[Rs_],"Rsb": df_results[Rsb_]})
+        {
+            "Correlacion": Uo_corr,
+            "Presion": RAND_PRESIONS,
+            "Presion_burb": df_data[PRESION_SAT],
+            "API": df_data[API],
+            "Temperatura": df_data[TEMPERATURA],
+            "Rs": df_results[Rs_],
+            "Rsb": df_results[Rsb_],
+        }
+    )
     v_Uo = []
     for i in range(Num_datos):
-        Uo_resul = Uo(*(
-            Params_Uo.iloc[i, 0], Params_Uo.iloc[i, 1], Params_Uo.iloc[i, 2], Params_Uo.iloc[i, 3], Params_Uo.iloc[i, 4], Params_Uo.iloc[i, 5], Params_Uo.iloc[i, 6]))
+        Uo_resul = Uo(
+            *(
+                Params_Uo.iloc[i, 0],
+                Params_Uo.iloc[i, 1],
+                Params_Uo.iloc[i, 2],
+                Params_Uo.iloc[i, 3],
+                Params_Uo.iloc[i, 4],
+                Params_Uo.iloc[i, 5],
+                Params_Uo.iloc[i, 6],
+            )
+        )
         v_Uo.append(Uo_resul)
 
     sheet_summary["K6"].options(transpose=True).value = v_Uo
